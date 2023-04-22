@@ -15,16 +15,16 @@ export const handler = middy(
     const userId = getUserId(event);
     try {
       await deleteTodo(userId, todoId)
-      return newAPIGatewayProxyResult(JSON.stringify({
+      return newAPIGatewayProxyResult({
         id: todoId,
-      }));
+      });
     } catch (e) {
       const err = e as HttpError;
-      return newAPIGatewayProxyResult(JSON.stringify({
+      return newAPIGatewayProxyResult({
         error: {
           message: err.message,
         }
-      }), {}, err.statusCode);
+      },  err.statusCode);
     }
   }
 )

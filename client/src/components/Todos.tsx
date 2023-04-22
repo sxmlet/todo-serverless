@@ -17,6 +17,7 @@ import {
 import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
+import { AxiosError } from 'axios'
 
 interface TodosProps {
   auth: Auth
@@ -57,8 +58,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         newTodoName: ''
       })
     } catch(e) {
-      alert('Todo creation failed')
-      alert(e)
+      const err = e as AxiosError;
+      alert('Todo creation failed: ' + err.response?.data.error.message)
     }
   }
 
@@ -86,8 +87,9 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
           [pos]: { done: { $set: !todo.done } }
         })
       })
-    } catch {
-      alert('Todo update failed')
+    } catch(e) {
+      const err = e as AxiosError;
+      alert('Todo update failed: ' + err.response?.data.error.message)
     }
   }
 

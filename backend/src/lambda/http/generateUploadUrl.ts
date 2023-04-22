@@ -19,16 +19,16 @@ export const handler = middy(
       await updateTodo(uid, todoId, {
         attachmentUrl: `https://${process.env.ATTACHMENT_S3_BUCKET}.s3.amazonaws.com/${objectKey}`
       })
-      return newAPIGatewayProxyResult(JSON.stringify({
+      return newAPIGatewayProxyResult({
         uploadUrl: url,
-      }), {})
+      })
     } catch (e) {
       const err = e as HttpError;
-      return newAPIGatewayProxyResult(JSON.stringify({
+      return newAPIGatewayProxyResult({
         error: {
           message: err.message,
         }
-      }), {}, err.statusCode);
+      }, err.statusCode);
     }
   }
 )
