@@ -5,8 +5,9 @@ type header = {
 }
 
 export const RESPONSE_CREATED = 201;
+export const RESPONSE_SUCCESS = 200;
 
-export function newAPIGatewayProxyResult(body: string, headers: header = {}, statusCode: number = 200): APIGatewayProxyResult {
+export function newAPIGatewayProxyResult(body: string, headers: header = {}, statusCode: number = RESPONSE_SUCCESS): APIGatewayProxyResult {
   return {
     statusCode: statusCode,
     body: body,

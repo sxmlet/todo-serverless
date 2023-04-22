@@ -60,7 +60,7 @@ export class TodosAccess {
     logger.info(JSON.stringify(resp.$response.data));
   }
 
-  async getAllTodoItemsForUser(userId: string) {
+  async getAllTodoItemsForUser(userId: string): Promise<Array<TodoItem>> {
     const result = await this.client.query({
       TableName: this.tableName,
       IndexName: process.env.TODOS_CREATED_AT_INDEX,
@@ -74,6 +74,16 @@ export class TodosAccess {
     return result.Items as TodoItem[]
   }
 
+  /**
+   * Updates the provided item in dynamoDB.
+   *
+   * Creates a hashed name attribute to make sure that the attribute names are
+   * not reserved.
+   *
+   * @param userId
+   * @param todoId
+   * @param data
+   */
   async updateTodoItem(userId: string, todoId: string, data: UpdateTodoRequest): Promise<TodoUpdate> {
     let hash = createHash('sha1');
     hash.update(todoId);
@@ -91,18 +101,14 @@ export class TodosAccess {
       updateExpr.push(`#${hashedAttr} = :${d}`);
     }
 
-    try {
-      await this.client.update({
-        TableName: this.tableName,
-        Key: { todoId: todoId },
-        ConditionExpression: 'userId = :userId',
-        ExpressionAttributeNames: expAttrNames,
-        ExpressionAttributeValues: expAttr,
-        UpdateExpression: 'SET ' + updateExpr.join(','),
-      }).promise();
-      return data;
-    } catch (e) {
-      logger.info(JSON.stringify(e));
-    }
+    await this.client.update({
+      TableName: this.tableName,
+      Key: { todoId: todoId },
+      ConditionExpression: 'userId = :userId',
+      ExpressionAttributeNames: expAttrNames,
+      ExpressionAttributeValues: expAttr,
+      UpdateExpression: 'SET ' + updateExpr.join(','),
+    }).promise();
+    return data;
   }
 }
