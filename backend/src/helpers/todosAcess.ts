@@ -6,10 +6,8 @@ import { TodoItem } from '../models/TodoItem'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest.js'
 import { TodoUpdate } from '../models/TodoUpdate.js'
 import { createHash } from 'crypto'
-// import { TodoUpdate } from '../models/TodoUpdate';
 
 const XAWS = AWSXRay.captureAWS(AWS)
-
 const logger = createLogger('TodosAccess')
 
 export class TodosAccess {
@@ -18,46 +16,25 @@ export class TodosAccess {
     private readonly tableName = process.env.TODOS_TABLE) {
   }
 
-  async getAllTodoItems(): Promise<TodoItem[]> {
-    const result = await this.client.scan({
-      TableName: this.tableName
+  async createTodoItem(todo: TodoItem): Promise<TodoItem> {
+    await this.client.put({
+      TableName: this.tableName,
+      Item: todo,
     }).promise()
-
-    const items = result.Items
-    return items as TodoItem[]
-  }
-
-  async createTodoItem(todo: TodoItem): Promise<TodoItem|null> {
-    try {
-      await this.client.put({
-        TableName: this.tableName,
-        Item: todo,
-      }).promise()
-      logger.info('create new item with name ' + todo.name + 'and id ' + todo.todoId)
-    } catch (e) {
-      logger.error('failed to create new item, error: ' +  JSON.stringify(e))
-      return null;
-    }
-    return todo
+    logger.info('create new item with name ' + todo.name + 'and id ' + todo.todoId)
+    return todo;
   }
 
   async deleteTodoItem(userId: string, todoId: string): Promise<void> {
-    let resp = null;
-    try {
-      resp = await this.client.delete({
-        TableName: this.tableName,
-        Key: { todoId: todoId },
-        ConditionExpression: 'userId = :uid',
-        ExpressionAttributeValues: {
-          ':uid': userId,
-        },
-      }).promise()
-    } catch (e) {
-      logger.info('delete todo item with id:', e)
-      return;
-    }
-
-    logger.info(JSON.stringify(resp.$response.data));
+    await this.client.delete({
+      TableName: this.tableName,
+      Key: { todoId: todoId },
+      ConditionExpression: 'userId = :uid',
+      ExpressionAttributeValues: {
+        ':uid': userId,
+      },
+    }).promise()
+    logger.info(`todo item with id ${todoId} has been deleted for user ${userId}`);
   }
 
   async getAllTodoItemsForUser(userId: string): Promise<Array<TodoItem>> {
