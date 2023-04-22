@@ -17,14 +17,14 @@ export const handler = middy(
     const uid = getUserId(event);
     try {
       const updated = await updateTodo(uid, todoId, updatedTodo)
-      return newAPIGatewayProxyResult(JSON.stringify(updated));
+      return newAPIGatewayProxyResult(updated);
     } catch (e) {
       const err = e as HttpError;
-      return newAPIGatewayProxyResult(JSON.stringify({
+      return newAPIGatewayProxyResult({
         error: {
           message: err.message,
         }
-      }), {}, err.statusCode);
+      }, err.statusCode);
     }
   });
 
