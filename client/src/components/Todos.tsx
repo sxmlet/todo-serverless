@@ -59,7 +59,9 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       })
     } catch(e) {
       const err = e as AxiosError;
-      alert('Todo creation failed: ' + err.response?.data.error.message)
+      const body = err.response?.data;
+      let msg = body.error?.message ?? body.message;
+      alert('Todo creation failed: ' + msg)
     }
   }
 
@@ -89,7 +91,9 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       })
     } catch(e) {
       const err = e as AxiosError;
-      alert('Todo update failed: ' + err.response?.data.error.message)
+      const body = err.response?.data;
+      let msg = body.error?.message ?? body.message;
+      alert('Todo update failed: ' + msg)
     }
   }
 
