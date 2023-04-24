@@ -6,5 +6,5 @@ repository [here](https://github.com/udacity/cloud-developer/tree/master/course-
 ## Getting started
 
 * Important: applications operate on **nodejs 12**
-* Application backend can be reached here: https://coaamil8y2.execute-api.us-east-1.amazonaws.com/dev
+* Application backend can be reached here: https://3cupq3vk39.execute-api.us-east-1.amazonaws.com/dev
 * Frontend application has been configured, run `npm run start` in the client repository
