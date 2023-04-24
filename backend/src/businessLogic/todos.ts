@@ -14,12 +14,7 @@ const attachment = new Attachment();
 const logger = createLogger('todo-service');
 
 export async function createTodo(userId: string, data: CreateTodoRequest): Promise<TodoItem> {
-  const validateTime = d => {
-    if (new Date(d.dueDate) < new Date(Date.now())) {
-      throw createError(RESPONSE_BAD_REQUEST, 'dueDate should be higher than current date');
-    }
-  };
-  validateBody(data, [validateTime]);
+  validateBody(data);
 
   const todoItem: TodoItem = {
     name: data.name,
@@ -66,7 +61,6 @@ export async function getTodosForUser(userId: string): Promise<TodoItem[]> {
 }
 
 export async function updateTodo(userId: string, todoId: string, data: UpdateTodoRequest): Promise<TodoUpdate> {
-  validateBody(data);
   try {
     return await todoAccess.updateTodoItem(userId, todoId, data);
   } catch (e) {
@@ -80,23 +74,22 @@ export async function updateTodo(userId: string, todoId: string, data: UpdateTod
  *
  * @param body
  *   The request body to validate.
- * @param extraValidations
- *   An extra set of validations to carry out.
  */
-function validateBody(body: CreateTodoRequest|UpdateTodoRequest, extraValidations: Array<Function> = []): void {
-  if (body.name && body.name == '') {
+function validateBody(body: CreateTodoRequest): void {
+  if (body.name == '') {
     throw createError(RESPONSE_BAD_REQUEST, 'name should not be empty');
   }
 
-  if (body.dueDate && body.dueDate == '') {
+  if (body.dueDate == '') {
     throw createError(RESPONSE_BAD_REQUEST, 'dueDate should not be empty');
   }
 
   const dueDate = new Date(body.dueDate);
-  if (body.dueDate && dueDate.toString() === 'Invalid Date') {
+  if (dueDate.toString() === 'Invalid Date') {
     throw createError(RESPONSE_BAD_REQUEST, 'dueDate should be valid date');
   }
 
-  if (extraValidations.length === 0) return;
-  extraValidations.forEach(f => f(body));
+  if (dueDate < new Date(Date.now())) {
+    throw createError(RESPONSE_BAD_REQUEST, 'dueDate should be higher than current date');
+  }
 }
